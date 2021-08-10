@@ -1,0 +1,41 @@
+apiVersion: skaffold/v2beta20
+kind: Config
+
+build:
+  artifacts:
+  - image: node-example
+    context: backend
+
+profiles:
+  - name: dev
+    activation:
+      - command: dev
+    build:
+      artifacts:
+      - image: node-example
+        context: backend
+        docker:
+          buildArgs:
+            ENV: development
+        sync:
+          infer:
+          - 'src/**/*.js'
+  - name: debug
+    activation:
+    - command: debug
+    build:
+      artifacts:
+      - image: node-example
+        context: backend
+        sync:
+          infer:
+          - 'src/**/*.js'
+        docker:
+          buildArgs:
+            ENV: development
+            IMAGE: node:14.9-alpine
+portForward:
+  - resourceType: service
+    resourceName: node
+    port: 3000
+    localPort: 3000
